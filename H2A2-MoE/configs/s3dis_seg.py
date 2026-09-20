@@ -1,0 +1,160 @@
+# Evaluation configuration. Dataset paths are relative to this repository.
+_base_ = [
+    './_base_/runtime.py',
+]
+data_root = 'data/s3dis_seg/'
+model = dict(
+    backbone=dict(
+        block_conv_cfg=dict(num_private_experts=1, num_shared_experts=3),
+        block_conv_type='multi',
+        depth=34,
+        in_channels=3,
+        norm='batch',
+        num_planes=(
+            64,
+            128,
+            128,
+            128,
+        ),
+        pool=False,
+        return_stem=True,
+        stem_channels=64,
+        stem_kernel_size=5,
+        stem_stride=1,
+        type='TR3DMinkResNet'),
+    data_preprocessor=dict(
+        batch_first=True,
+        ignore_index=13,
+        max_voxels=None,
+        type='TR3DOfficialMinkowskiPreprocessor',
+        voxel=True,
+        voxel_layer=dict(
+            max_num_points=-1,
+            max_voxels=(
+                -1,
+                -1,
+            ),
+            point_cloud_range=[
+                -100,
+                -100,
+                -20,
+                100,
+                100,
+                20,
+            ],
+            voxel_size=[
+                0.05,
+                0.05,
+                0.05,
+            ]),
+        voxel_type='prequantized_minkunet'),
+    decode_head=dict(
+        channels=96,
+        conv_seg_kernel_size=1,
+        ignore_index=13,
+        loss_decode=dict(avg_non_ignore=True, type='mmdet.CrossEntropyLoss'),
+        num_classes=13,
+        type='TR3DMinkUNetHead'),
+    input_feature_indices=(
+        3,
+        4,
+        5,
+    ),
+    neck=dict(
+        depth=34,
+        encoder_channels=(
+            64,
+            64,
+            128,
+            128,
+            128,
+        ),
+        planes=(
+            32,
+            64,
+            128,
+            256,
+            256,
+            128,
+            96,
+            96,
+        ),
+        type='TR3DMinkUNetDecoder'),
+    test_cfg=dict(),
+    type='TR3DMinkUNet')
+test_pipeline = [
+    dict(
+        backend_args=None,
+        coord_type='DEPTH',
+        load_dim=6,
+        shift_height=False,
+        type='LoadPointsFromFile',
+        use_color=True,
+        use_dim=[
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+        ]),
+    dict(
+        backend_args=None,
+        type='LoadAnnotations3D',
+        with_bbox_3d=False,
+        with_label_3d=False,
+        with_mask_3d=False,
+        with_seg_3d=True),
+    dict(type='PointSegClassMapping'),
+    dict(color_mean=[
+        127.5,
+        127.5,
+        127.5,
+    ], type='NormalizePointsColor'),
+    dict(
+        average_features=True,
+        ignore_index=13,
+        type='TR3DOfficialSparseQuantize',
+        voxel_size=0.05),
+    dict(keys=[
+        'points',
+    ], type='TR3DPack3DDetInputs'),
+]
+
+test_dataloader = dict(
+    batch_size=1,
+    dataset=dict(
+        ann_files='s3dis_infos_Area_5.pkl',
+        backend_args=None,
+        data_prefix=dict(
+            pts='points',
+            pts_instance_mask='instance_mask',
+            pts_semantic_mask='semantic_mask'),
+        data_root=data_root,
+        ignore_index=13,
+        metainfo=dict(
+            classes=(
+                'ceiling',
+                'floor',
+                'wall',
+                'beam',
+                'column',
+                'window',
+                'door',
+                'table',
+                'chair',
+                'sofa',
+                'bookcase',
+                'board',
+                'clutter',
+            )),
+        modality=dict(use_camera=False, use_lidar=True),
+        pipeline=test_pipeline,
+        scene_idxs='seg_info/Area_5_resampled_scene_idxs.npy',
+        test_mode=True,
+        type='S3DISSegDataset'),
+    drop_last=False,
+    num_workers=1,
+    persistent_workers=True,
+    sampler=dict(shuffle=False, type='DefaultSampler'))
+test_evaluator = dict(type='SegMetric')

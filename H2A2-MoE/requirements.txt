@@ -1,0 +1,8 @@
+# Install matching PyTorch, CUDA, and MMCV binaries first (README.md, Installation).
+mmengine==0.10.7
+mmcv==2.1.0
+mmdet==3.2.0
+mmdet3d==1.4.0
+numpy==1.24.3
+scipy==1.10.1
+# MinkowskiEngine 0.5.4 requires a separate source build; see README.md.
