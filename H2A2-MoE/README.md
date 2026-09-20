@@ -4,6 +4,8 @@ Official evaluation code for **H2A2-MoE**, a unified indoor 3D perception framew
 
 H2A2-MoE introduces **Variance-Aware Soft Mixture-of-Experts (VA-SoftMoE)** into the sparse backbone to balance shared representation learning and task-specific adaptation across heterogeneous datasets and tasks. The framework supports six indoor 3D detection benchmarks and two semantic segmentation benchmarks.
 
+[**Checkpoints**](https://drive.google.com/drive/folders/1YvXK9Rz3UJjFkqZTqKw37z8q_9D2PKfo?usp=sharing) | [**Data Preparation**](docs/DATA.md) | [**Visualization**](docs/VISUALIZATION.md)
+
 ## Highlights
 
 - **Unified indoor 3D perception:** jointly supports object detection and semantic segmentation across multiple indoor datasets.
