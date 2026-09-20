@@ -2,7 +2,7 @@
 
 Official evaluation code for **H2A2-MoE**, a unified indoor 3D perception framework for jointly learning 3D object detection and semantic segmentation across heterogeneous indoor datasets.
 
-H2A2-MoE is built upon a TR3D-style sparse 3D backbone and introduces **Variance-Aware Soft Mixture-of-Experts (VA-SoftMoE)** to improve representation sharing and task-specific adaptation. The model supports six indoor 3D detection benchmarks and two semantic segmentation benchmarks within a unified framework.
+H2A2-MoE introduces **Variance-Aware Soft Mixture-of-Experts (VA-SoftMoE)** into the sparse backbone to balance shared representation learning and task-specific adaptation across heterogeneous datasets and tasks. The framework supports six indoor 3D detection benchmarks and two semantic segmentation benchmarks.
 
 ## Highlights
 
